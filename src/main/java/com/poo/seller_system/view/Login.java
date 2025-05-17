@@ -273,11 +273,16 @@ public class Login extends javax.swing.JFrame {
         User userLogin = loginService.login(loginDTO);
         
         if(userLogin == null){
-            JOptionPane.showMessageDialog(this, "Seleccione un cliente", "Aviso!", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Las credenciales no son validas", "Aviso!", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
         Seller_system.currentUser = userLogin;
+        
+        if(!userLogin.isEnabled()){
+            JOptionPane.showMessageDialog(this, "El usuario se encuentra deshabilitado. Intente con otro usuario", "Aviso!", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         
         switch(userLogin.getRole().getName()){
             case "USER" -> {

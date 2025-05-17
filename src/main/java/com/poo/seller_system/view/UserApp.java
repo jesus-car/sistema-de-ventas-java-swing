@@ -102,6 +102,10 @@ public class UserApp extends javax.swing.JFrame {
     private boolean clientSaleFlag = false;
     private boolean productOrderFlag = false;
     private boolean providerOrderFlag = false;
+    private boolean categoryFlag = false;
+    private boolean productFlag = false;
+    private boolean reportSaleFlag = false;
+    private boolean reportOrderFlag = false;
       
     
 
@@ -208,7 +212,9 @@ public class UserApp extends javax.swing.JFrame {
         // Fill CB roles
         roles = RoleService.getInstance().getAllRoles();
         
-        roles.stream().forEach( r -> userRoleCB.addItem(r.getName()));
+        roles.stream()
+                .filter(r -> !"SUPERADMIN".equals(r.getName()))
+                .forEach( r -> userRoleCB.addItem(r.getName()));
         
         
         
@@ -270,6 +276,8 @@ public class UserApp extends javax.swing.JFrame {
         
         fillReportSaleTable();
         fillReportOrderTable();
+        
+        jTabbedPane1.setSelectedIndex(4);
     }
     // UserFilter
     
@@ -279,6 +287,7 @@ public class UserApp extends javax.swing.JFrame {
         userTable.setRowSorter(sorter);
         
         String[] columnNames = {"ID","Nr. Documento", "Nombre", "Correo", "Rol", "Estado"};
+        userFilterCB.removeAllItems();
         for(String col : columnNames){
             userFilterCB.addItem(col);
         }
@@ -315,7 +324,8 @@ public class UserApp extends javax.swing.JFrame {
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         categoryTable.setRowSorter(sorter);
         
-        String[] columnNames = {"Descriptcion","Estado"};
+        String[] columnNames = {"ID","Descripcion", "Estado"};
+        categoryFilterCB.removeAllItems();
         for(String col : columnNames){
             categoryFilterCB.addItem(col);
         }
@@ -352,6 +362,7 @@ public class UserApp extends javax.swing.JFrame {
         productTable.setRowSorter(sorter);
         
         String[] columnNames = {"ID","Codigo", "Nombre", "Descripcion", "Categoria", "Stock","Precio lista","Estado"};
+        productFilterCB.removeAllItems();
         for(String col : columnNames){
             productFilterCB.addItem(col);
         }
@@ -387,6 +398,7 @@ public class UserApp extends javax.swing.JFrame {
         table.setRowSorter(sorter);
         
         String[] columnNames = headers;
+        comboBox.removeAllItems();
         for(String col : columnNames){
             comboBox.addItem(col);
         }
@@ -703,7 +715,10 @@ public class UserApp extends javax.swing.JFrame {
         }
         
         categoryTable.setModel(model);   
-        categoryFilter();
+        if(!categoryFlag){
+            categoryFilter();
+            categoryFlag = true;
+        } 
         
         TableColumn col1 = categoryTable.getColumnModel().getColumn(0);
         col1.setMinWidth(30);
@@ -746,8 +761,12 @@ public class UserApp extends javax.swing.JFrame {
         }
         
         productTable.setModel(model);  
-        productFilter();
+//        if(!productFlag){
+//            productFlag = true;
+//        }
         
+        productFilter();
+
         TableColumn col1 = productTable.getColumnModel().getColumn(0);
         col1.setMinWidth(30);
         col1.setMaxWidth(30);
@@ -872,7 +891,9 @@ public class UserApp extends javax.swing.JFrame {
             }
         };
         
-        productsListTableSale = productService.allProducts();
+        productsListTableSale = productService.allProducts().stream()
+                .filter(p -> p.getProductDetail().isEnabled())
+                .toList();
         
         
         List<Product> products = productsToSell.stream()
@@ -921,7 +942,9 @@ public class UserApp extends javax.swing.JFrame {
             }
         };
         
-        productsListTableOrder = productService.allProducts();
+        productsListTableOrder = productService.allProducts().stream()
+                .filter(p -> p.getProductDetail().isEnabled())
+                .toList();
         
         
         List<Product> products = productsToBuy.stream()
@@ -964,7 +987,9 @@ public class UserApp extends javax.swing.JFrame {
             }
         };
         
-        clientListTableSale = clientService.allClients();
+        clientListTableSale = clientService.allClients().stream()
+                .filter(c -> c.isEnabled())
+                .toList();
         
         for(Client c : clientListTableSale){
             
@@ -977,11 +1002,11 @@ public class UserApp extends javax.swing.JFrame {
         }
         
         listClientTable.setModel(model);
-        if(!clientSaleFlag){
-            String[] listClientCaleta = {"ID","Nro. Documento", "Nombre"};
-            openFilter(listClientTable,listClientCaleta, clientFilterOptionCB,clientFilterOptionField);
-            clientSaleFlag = true;
-        }  
+//        if(!clientSaleFlag){
+//            String[] listClientCaleta = {"ID","Nro. Documento", "Nombre"};
+//            openFilter(listClientTable,listClientCaleta, clientFilterOptionCB,clientFilterOptionField);
+//            clientSaleFlag = true;
+//        }  
         
         TableColumn col1 = listClientTable.getColumnModel().getColumn(0);
         col1.setMinWidth(60);
@@ -1069,7 +1094,9 @@ public class UserApp extends javax.swing.JFrame {
             }
         };
         
-        providerListTableBuy = providerService.allProviders();
+        providerListTableBuy = providerService.allProviders().stream()
+                .filter(p -> p.isEnabled())
+                .toList();
         
         for(Provider p : providerListTableBuy){
             
@@ -1082,11 +1109,11 @@ public class UserApp extends javax.swing.JFrame {
         }
         
         listProviderTable.setModel(model);
-        if(!providerOrderFlag){
-            String[] listProviderCaleta = {"ID","RUC", "Razon Social"};
-            openFilter(listProviderTable,listProviderCaleta, jComboBox13,jTextField21);
-            providerOrderFlag = true;
-        }
+//        if(!providerOrderFlag){
+//            String[] listProviderCaleta = {"ID","RUC", "Razon Social"};
+//            openFilter(listProviderTable,listProviderCaleta, jComboBox13,jTextField21);
+//            providerOrderFlag = true;
+//        }
         
         TableColumn col1 = listProviderTable.getColumnModel().getColumn(0);
         col1.setMinWidth(60);
@@ -1126,6 +1153,7 @@ public class UserApp extends javax.swing.JFrame {
         }
         
         reportSaleTable.setModel(model);
+
         String[] listDetailsSale = {"Id de venta", "Fecha de venta", "Cliente", "Vendedor", "Tipo de Documento", "Monto total"};
         openFilter(reportSaleTable,listDetailsSale, jComboBox2,jTextField1);
     }
@@ -1159,8 +1187,9 @@ public class UserApp extends javax.swing.JFrame {
         }
         
         reportOrderTable.setModel(model);
+
         String[] listDetailsOrder = {"Id de compra", "Fecha de compra", "Proveedor", "Usuario", "Tipo de Documento", "Monto total"};
-        openFilter(reportOrderTable,listDetailsOrder, jComboBox3,jTextField2); 
+        openFilter(reportOrderTable,listDetailsOrder, jComboBox3,jTextField2);
     }
     
     // Buy Options
@@ -3986,8 +4015,16 @@ public class UserApp extends javax.swing.JFrame {
             return;
         }
         
-        Double change = Double.valueOf(changeSaleField.getText());
-        Double clientAmount = Double.valueOf(payWithSaleField.getText());
+        Double change;
+        Double clientAmount;
+        try{
+            change = Double.valueOf(changeSaleField.getText());
+            clientAmount = Double.valueOf(payWithSaleField.getText());
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Ingrese el monto con el que paga el cliente!", "Aviso!", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
         
         if(change < 0){
             JOptionPane.showMessageDialog(this, "Monto invalido", "Aviso!", JOptionPane.INFORMATION_MESSAGE);
@@ -4316,13 +4353,11 @@ public class UserApp extends javax.swing.JFrame {
         jTabbedPane1.setSelectedIndex(1);
         cleanOrderForm();
         cleanSaleForm();
-        fillCategoryTable();
     } 
     private void productsButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
         jTabbedPane1.setSelectedIndex(2);
         cleanOrderForm();
         cleanSaleForm();
-        fillProductTable();
     } 
     
     private void bussinessButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
@@ -4364,8 +4399,6 @@ public class UserApp extends javax.swing.JFrame {
         jTabbedPane1.setSelectedIndex(11);
         cleanSaleForm();
         cleanOrderForm();
-        fillReportSaleTable();
-        
     } 
     /**
      * @param args the command line arguments
