@@ -121,6 +121,8 @@ public class GrocerApp extends javax.swing.JFrame {
 
         this.setLocation(x, y);
         
+        currentUsername.setText(Seller_system.currentUser.getName());
+        
         // Mantainer submenu
         mantainerCategory = new JMenuItem("Categorias");
         mantainerProducts = new JMenuItem("Productos");        
@@ -1408,6 +1410,8 @@ public class GrocerApp extends javax.swing.JFrame {
         listProviderTable = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jLabel105 = new javax.swing.JLabel();
+        currentUsername = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         mantainerButton = new javax.swing.JButton();
         shopButton = new javax.swing.JButton();
@@ -1989,6 +1993,16 @@ public class GrocerApp extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Sistema de ventas");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 380, 40));
+
+        jLabel105.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel105.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel105.setText("Usuario:");
+        jPanel1.add(jLabel105, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 20, -1, 20));
+
+        currentUsername.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        currentUsername.setForeground(new java.awt.Color(255, 255, 255));
+        currentUsername.setText("jLabel109");
+        jPanel1.add(currentUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 20, 90, 20));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1120, 60));
 
@@ -4132,6 +4146,10 @@ public class GrocerApp extends javax.swing.JFrame {
         BigDecimal unitPrice = new BigDecimal(buyPriceProductBuyField.getText());
         Double subtotal = Double.valueOf(subtotalBuyField.getText());
         
+        if(selectedProductToBuy.getProductDetail().getListPrime().compareTo(unitPrice) < 0){
+            JOptionPane.showMessageDialog(this, "El precio de compra no puede ser mayor al precio de lista", "Error!", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         OrderDetail od = OrderDetail.builder()
                 .product(selectedProductToBuy)
                 .quantity(quantity)
@@ -4489,6 +4507,7 @@ public class GrocerApp extends javax.swing.JFrame {
     private javax.swing.JTextField codeProductSaleField;
     private javax.swing.JTextField codeSaleField;
     private javax.swing.JPasswordField confirmPasswordField;
+    private javax.swing.JLabel currentUsername;
     private javax.swing.JTextField dateBuyField;
     private javax.swing.JTextField dateDetailOrder;
     private javax.swing.JTextField dateDetailSale;
@@ -4556,6 +4575,7 @@ public class GrocerApp extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel102;
     private javax.swing.JLabel jLabel103;
     private javax.swing.JLabel jLabel104;
+    private javax.swing.JLabel jLabel105;
     private javax.swing.JLabel jLabel106;
     private javax.swing.JLabel jLabel107;
     private javax.swing.JLabel jLabel108;
